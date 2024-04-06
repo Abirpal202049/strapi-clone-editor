@@ -1,4 +1,14 @@
+const API_URL = "http://localhost:4000"
 /** @type {import('next').NextConfig} */
-const nextConfig = {}
+const nextConfig = {
+//   async rewrites() {
+//     return [
+//       {
+//         source: "/api/:path*",
+//         destination: `${API_URL}/api/:path*`,
+//       },
+//     ];
+//   },
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
