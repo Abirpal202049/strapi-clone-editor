@@ -1,0 +1,77 @@
+{
+  "title": "Schema for alert type extra fields",
+  "type": "array",
+  "items": [
+    {
+      "$ref": "#/$defs/alertTypeExtraField"
+    }
+  ],
+  "minItems": 1,
+  "$defs": {
+    "alertTypeExtraField": {
+      "type": "object",
+      "properties": {
+        "field_name": {
+          "type": "string",
+          "description": "Name of the extra field"
+        },
+        "field_type": {
+          "type": "string",
+          "description": "Type of the extra field",
+          "enum": ["string", "number", "date", "boolean", "array", "object"]
+        },
+        "field_description": {
+          "type": "string",
+          "description": "Description of the extra field"
+        },
+        "required": {
+          "type": "boolean",
+          "description": "Whether the extra field is required"
+        },
+        "children": {
+          "type": "array",
+          "description": "Children of the extra field if the type is object or array",
+          "items": {
+            "$ref": "#/$defs/alertTypeExtraField"
+          },
+          "minItems": 1
+        }
+      },
+      "required": ["field_name", "field_description", "required"],
+      "additionalProperties": false,
+      "allOf": [
+        { "$ref": "#/$defs/children-implies-type" },
+        { "$ref": "#/$defs/required-in-array" }
+      ]
+    },
+    "children-implies-type": {
+      "anyOf": [
+        {
+          "not": {
+            "properties": { "field_type": { "enum": ["object", "array"] } },
+            "required": ["field_type"]
+          }
+        },
+        {
+          "required": ["children"]
+        }
+      ]
+    },
+    "required-in-array": {
+      "if": {
+        "properties": {
+          "field_type": {
+            "const": "array"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "children": {
+            "maxItems": 1
+          }
+        }
+      }
+    }
+  }
+}

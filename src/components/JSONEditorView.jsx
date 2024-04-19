@@ -1,33 +1,46 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import VisualEditor from "./VisualEditor";
+import validate from "@/lib/Ajv";
+import EditorJSON from "../../trial";
 
 export default function JSONEditorView({ data }) {
   const [jsonData, setJsonData] = useState("[]");
   const [isValid, setIsValid] = useState(true);
   const [validJsonData, setValidJsonData] = useState("[]");
+  const [errormsg, setErrormsg] = useState(null);
 
   const validateJson = (jsonString) => {
+    // JSON.parse(jsonString);
+    let rawjson;
     try {
-      JSON.parse(jsonString);
-      setIsValid(true);
-      setValidJsonData(jsonString);
+      rawjson = JSON.parse(jsonString);
     } catch (error) {
       setIsValid(false);
+      setErrormsg("Invalid JSON syntext");
+      return;
     }
+    const isValid = validate(rawjson);
+    setIsValid(isValid);
+    if (isValid) {
+      setValidJsonData(jsonString);
+      setErrormsg(null);
+    } else setErrormsg(validate.errors?.[0]?.message);
   };
 
   console.log(jsonData);
+  console.log("errormsg: ", errormsg, isValid);
 
   const onJsonDataChange = (e) => {
     const json = e.target.value;
     setJsonData(json);
     validateJson(json);
+    // console.log("json: ", json);
   };
 
   return (
     <div className="my-5 flex justify-between gap-x-5 ">
-      <div className="w-[50%] bg-red-400/10 rounded-lg relative">
+      <div className="w-1/2 bg-red-400/10 rounded-lg relative">
         <textarea
           name="jsoneditor"
           id="jsoneditor"
@@ -44,6 +57,11 @@ export default function JSONEditorView({ data }) {
           </div>
         )}
         {/* <div id="jsonEditor" className="h-[60vh]"></div> */}
+        {errormsg && (
+          <div className="shadow bg-red-500 text-white px-5 py-2 rounded m-2">
+            <p className="font-medium">{errormsg}</p>
+          </div>
+        )}
       </div>
 
       <div className="w-[50%] flex-1 rounded-lg border-gray-800">
