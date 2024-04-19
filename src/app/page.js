@@ -1,13 +1,14 @@
 "use client";
 
-import { Plus } from "lucide-react";
-import ExtraFieldList from "@/components/ExtraFieldList";
 import axios from "axios";
 
 import { useEffect, useState } from "react";
+import VisualEditor from "@/components/VisualEditor";
+import JSONEditorView from "@/components/JSONEditorView";
 
 export default function Home() {
   const [data, setData] = useState();
+  const [currentTab, setCurrentTab] = useState("jsoneditor");
 
   const fetechData = async () => {
     const res = await axios.get("https://api.npoint.io/0d656a8c1ae346b1171d");
@@ -21,26 +22,48 @@ export default function Home() {
 
   return (
     <div className="container mx-auto ">
-
-
-      <div className="border border-gray-800 m-10  rounded flex flex-col text-sm max-w-[1200px] mx-auto">
-        <div className="bg-gray-800 p-4 grid grid-cols-4 text-base font-medium px-10">
-          <h2>Field Name</h2>
-          <h2>Field Type</h2>
-          <h2>Required</h2>
+      {/* Tab */}
+      <div className="bg-slate-800  flex gap-x-4 rounded mt-10 px-4 py-4 items-center">
+        <h1 className="text-2xl flex-1 font-light">
+          Configure the extra fields of{" "}
+          <span className="font-medium underline">Trade Alert</span>{" "}
+        </h1>
+        <div
+          onClick={() => setCurrentTab("visual")}
+          className={` py-3 px-6  rounded font-medium hover:bg-white hover:text-black transition-all duration-200 cursor-pointer ${
+            currentTab === "visual"
+              ? "bg-white text-black"
+              : "bg-slate-500 text-white"
+          }`}
+        >
+          Visual Editor
         </div>
-        <div className="px-8">
-          <ExtraFieldList data={data} />
-        </div>
-        <div className="p-4 border-t border-slate-900 bg-slate-900 rounded-b">
-          <div className="pl-[11px] text-xs flex items-center gap-x-4 font-light py-1 opacity-60 cursor-pointer select-none">
-            <span className="bg-gray-700 rounded-full p-1">
-              <Plus size={15} strokeWidth={3} />
-            </span>
-            Add another single field to this alert-type
-          </div>
+        <div
+          onClick={() => setCurrentTab("jsoneditor")}
+          className={` py-3 px-6  rounded font-medium hover:bg-white hover:text-black transition-all duration-200 cursor-pointer ${
+            currentTab === "jsoneditor"
+              ? "bg-white text-black"
+              : "bg-slate-500 text-white"
+          }`}
+        >
+          JSON Editor
         </div>
       </div>
+
+      {/* Visual Editor */}
+      {currentTab === "visual" ? (
+        <div className="my-5">
+          <VisualEditor
+            data={data}
+            modificationAccess={true}
+            className="grid-cols-5"
+          />
+        </div>
+      ) : (
+        <JSONEditorView data={data} />
+      )}
+
+      {/* JSON Editor */}
     </div>
   );
 }
